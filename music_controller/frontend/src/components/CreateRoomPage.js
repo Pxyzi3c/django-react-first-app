@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
     Button,
@@ -15,6 +15,8 @@ import {
 } from '@mui/material';
 
 export default function CreateRoomPage() {
+    const navigate = useNavigate();
+
     const [defaultVotes, setDefaultVotes] = useState(2)
     const [guestCanPause, setGuestCanPause] = useState(true);
     const [votesToSkip, setVotesToSkip] = useState(defaultVotes);
@@ -34,14 +36,18 @@ export default function CreateRoomPage() {
                 guest_can_pause: guestCanPause
             });
 
-            console.log(response.data);
+            if (response.data && response.data.code) {
+                navigate(`/room/${response.data.code}`);
+            } else {
+                console.log("Error creating room:", error); 
+            }
         } catch (error) {
             console.log("Error creating room:", error);
         }
     }
 
     return (
-        <div>
+        <div class="container">
             <Grid container spacing={1}>
                 <Grid item xs={12} align="center">
                     <Typography component="h4" variant="h4">
