@@ -29,7 +29,7 @@ export default function Room() {
     }, [roomCode]);
 
     return (
-        <div class="container">
+        <div>
             <h3>Room Code: {roomCode}</h3>
             <p>Votes: {votesToSkip}</p>
             <p>Guest Can Pause: {guestCanPause.toString()}</p>
