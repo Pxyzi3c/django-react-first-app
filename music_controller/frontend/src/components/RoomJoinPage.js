@@ -10,10 +10,9 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function RoomJoinPage() {
-    const navigate = useNavigate();
-
     const [roomCode, setRoomCode] = useState("")
     const [error, setError] = useState("")
+    const navigate = useNavigate();
 
     const handleTextFieldChange = (e) => {
         setRoomCode(e.target.value)

@@ -3,8 +3,20 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import {
+    Typography,
+    Card,
+    CardContent,
+    CardHeader,
+    CardMedia,
+    Box,
+    Divider,
+    Chip
+} from '@mui/material';
 
 export default function Room() {
+    const [date, setDate] = useState(new Date());
+
     const [votesToSkip, setVotesToSkip] = useState(2);
     const [guestCanPause, setGuestCanPause] = useState(false);
     const [isHost, setIsHost] = useState(false);
@@ -29,11 +41,36 @@ export default function Room() {
     }, [roomCode]);
 
     return (
-        <div>
-            <h3>Room Code: {roomCode}</h3>
-            <p>Votes: {votesToSkip}</p>
-            <p>Guest Can Pause: {guestCanPause.toString()}</p>
-            <p>Host: {isHost.toString()}</p>
-        </div>
+        <Card className='p-4 rounded-lg shadow-lg transition-shadow hover:shadow-2xl'>
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
+                <CardContent sx={{ padding: '0', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <CardHeader
+                        title={roomCode}
+                        subheader={date.toDateString()}
+                        sx={{ padding: '0' }}
+                    />
+                    <Divider />
+                    <CardContent 
+                        sx={{ padding: '0' }}
+                    >
+                        <Typography variant="body2" color="text.secondary">
+                            Votes: <Chip color="primary" label={votesToSkip} size="small" />
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Guest Can Pause: <Chip color="primary" label={guestCanPause.toString()} size="small" />
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Host: <Chip color="primary" label={guestCanPause.toString()} size="small" />
+                        </Typography>
+                    </CardContent>
+                </CardContent>
+                <CardMedia
+                    component="img"
+                    sx={{ width: 200, height: 200, borderRadius: 1 }}
+                    image="https://picsum.photos/seed/picsum/200/300"
+                    alt="Live from space album cover"
+                />
+            </Box>
+        </Card>
     )
 }
