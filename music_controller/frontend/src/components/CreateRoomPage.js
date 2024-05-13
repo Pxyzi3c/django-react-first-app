@@ -47,8 +47,8 @@ export default function CreateRoomPage() {
     }
 
     return (
-        <div>
-            <Grid container spacing={1}>
+        <div className='flex justify-center'>
+            <Grid container spacing={1} sm={6} md={4} className='p-4 rounded-lg shadow-lg transition-shadow hover:shadow-2xl'>
                 <Grid item xs={12} align="center">
                     <Typography component="h4" variant="h4">
                         Create A Room
