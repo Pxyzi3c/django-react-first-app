@@ -36,12 +36,22 @@ export default function Room() {
         }
     }
 
+    const imageRandomizer = () => {
+        var length = 8,
+        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        retVal = "";
+        for (var i = 0, n = charset.length; i < length; ++i) {
+            retVal += charset.charAt(Math.floor(Math.random() * n));
+        }
+        return `https://picsum.photos/seed/${retVal}/200/300`;
+    }
+
     useEffect(() => {
         handleGetRoom();
     }, [roomCode]);
 
     return (
-        <Card className='p-4 rounded-lg shadow-lg transition-shadow hover:shadow-2xl'>
+        <Card className='p-4 rounded-lg shadow-lg transition-shadow hover:shadow-2xl' onClick={imageRandomizer}>
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
                 <CardContent sx={{ padding: '0', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <CardHeader
@@ -67,8 +77,8 @@ export default function Room() {
                 <CardMedia
                     component="img"
                     sx={{ width: 200, height: 200, borderRadius: 1 }}
-                    image="https://picsum.photos/seed/picsum/200/300"
-                    alt="Live from space album cover"
+                    image={imageRandomizer()}
+                    alt="Image placeholder"
                 />
             </Box>
         </Card>
