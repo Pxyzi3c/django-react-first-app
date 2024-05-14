@@ -592,12 +592,24 @@ video {
   display: flex;
 }
 
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
 .items-center {
   align-items: center;
 }
 
 .justify-center {
   justify-content: center;
+}
+
+.gap-4 {
+  gap: 1rem;
 }
 
 .rounded-lg {
@@ -642,6 +654,14 @@ html, body {
 
 .w-100 {
   width: 100%;
+}
+
+.hover\:border:hover {
+  border-width: 1px;
+}
+
+.hover\:bg-transparent:hover {
+  background-color: transparent;
 }
 
 .hover\:shadow-2xl:hover {
