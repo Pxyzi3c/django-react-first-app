@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function RoomJoinPage() {
-    const [roomCode, setRoomCode] = useState("")
+    const [roomCode, setRoomCode] = useState("Room Code")
     const [error, setError] = useState("")
     const navigate = useNavigate();
 
@@ -19,7 +19,7 @@ export default function RoomJoinPage() {
     }
 
     const handleEnterRoomPressed = async () => {
-        if (!roomCode) {
+        if (!roomCode || roomCode == "Room Code") {
             return setError("Please enter room code!")
         }
 
@@ -41,10 +41,10 @@ export default function RoomJoinPage() {
     }
 
     useEffect(() => {
-        if (roomCode) {
-            setError("")
-        } else {
+        if (!roomCode) {
             setError("Please enter room code!")
+        } else {
+            setError("")
         }
     }, [roomCode])
     return (

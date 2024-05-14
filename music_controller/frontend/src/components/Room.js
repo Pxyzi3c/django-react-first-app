@@ -1,7 +1,6 @@
 import React from 'react';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
     Typography,
@@ -11,15 +10,19 @@ import {
     CardMedia,
     Box,
     Divider,
-    Chip
+    Chip, 
+    Button
 } from '@mui/material';
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 
 export default function Room() {
+    const navigate = useNavigate();
     const [date, setDate] = useState(new Date());
 
     const [votesToSkip, setVotesToSkip] = useState(2);
     const [guestCanPause, setGuestCanPause] = useState(false);
     const [isHost, setIsHost] = useState(false);
+    const [leaveButton, leaveButtonPressed] = useState(false)
 
     const { roomCode } = useParams();
 
@@ -30,7 +33,6 @@ export default function Room() {
             setVotesToSkip(response.data.votes_to_skip)
             setGuestCanPause(response.data.guest_can_pause)
             setIsHost(response.data.is_host)
-            console.log(response.data);
         } catch (error) {
             console.log("Error fetching room:", error);
         }
@@ -46,12 +48,26 @@ export default function Room() {
         return `https://picsum.photos/seed/${retVal}/200/300`;
     }
 
+    const handleLeaveButtonPressed = async () => {
+        try {
+            const response = await axios.post("/api/leave-room", {
+                room_code: roomCode
+            });
+
+            if (response.status == 200) {
+                navigate("/");
+            }
+        } catch (error) {
+            console.log("Error leaving the room:", error);
+        }
+    }
+
     useEffect(() => {
         handleGetRoom();
     }, [roomCode]);
 
     return (
-        <Card className='p-4 rounded-lg shadow-lg transition-shadow hover:shadow-2xl' onClick={imageRandomizer}>
+        <Card className='p-4 flex flex-col gap-4 rounded-lg shadow-lg transition-shadow hover:shadow-2xl' onClick={imageRandomizer}>
             <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
                 <CardContent sx={{ padding: '0', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <CardHeader
@@ -80,6 +96,17 @@ export default function Room() {
                     image={imageRandomizer()}
                     alt="Image placeholder"
                 />
+            </Box>
+            <Box>
+                <Button 
+                    startIcon={<ArrowBackRoundedIcon />} 
+                    variant="contained" 
+                    color="secondary" 
+                    className='w-100' 
+                    onClick={handleLeaveButtonPressed}
+                >
+                    LEAVE ROOM
+                </Button>
             </Box>
         </Card>
     )

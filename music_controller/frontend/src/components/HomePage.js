@@ -25,7 +25,6 @@ export default function HomePage() {
             const response = await axios.get("/api/user-in-room")
 
             setRoomCode(response.data.code)
-            console.log(roomCode)
         } catch (error) {
             console.log(error)
         }
