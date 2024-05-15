@@ -5,7 +5,8 @@ from .views import (
     GetRoom,
     JoinRoom,
     UserInRoom,
-    LeaveRoom
+    LeaveRoom,
+    UpdateRoom
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('join-room', JoinRoom.as_view()),
     path('user-in-room', UserInRoom.as_view()),
     path('leave-room', LeaveRoom.as_view()),
+    path('update-room', UpdateRoom.as_view())
 ]

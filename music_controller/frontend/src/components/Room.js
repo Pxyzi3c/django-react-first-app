@@ -11,9 +11,13 @@ import {
     Box,
     Divider,
     Chip, 
-    Button
+    Button,
+    Grid,
 } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import IconButton from '@mui/material/IconButton';
+import CreateRoomPage from "./CreateRoomPage";
 
 export default function Room() {
     const navigate = useNavigate();
@@ -22,7 +26,7 @@ export default function Room() {
     const [votesToSkip, setVotesToSkip] = useState(2);
     const [guestCanPause, setGuestCanPause] = useState(false);
     const [isHost, setIsHost] = useState(false);
-    const [leaveButton, leaveButtonPressed] = useState(false)
+    const [showSettings, setShowSettings] = useState(false); 
 
     const { roomCode } = useParams();
 
@@ -62,52 +66,95 @@ export default function Room() {
         }
     }
 
+    const updateShowSettings = (value) => {
+        setShowSettings(value)
+    }
+
+    const renderSettings = () => {
+        return (
+            <Grid container spacing={1}>\
+                <Grid item xs={12} align="center">
+                    <CreateRoomPage 
+                        update={true} 
+                        votesToSkip={votesToSkip} 
+                        guestCanPause={guestCanPause} 
+                        roomCode={roomCode}
+                        updateCallback={null}
+                    />
+                </Grid>
+                <Grid item xs={12} align="center">
+                    <Button 
+                        variant="contained" 
+                        color="secondary" 
+                        className='w-100' 
+                        onClick={() => updateShowSettings(false)}
+                    >
+                        Close
+                    </Button>
+                </Grid>
+            </Grid>
+        )
+    }
+
     useEffect(() => {
         handleGetRoom();
     }, [roomCode]);
 
-    return (
-        <Card className='p-4 flex flex-col gap-4 rounded-lg shadow-lg transition-shadow hover:shadow-2xl' onClick={imageRandomizer}>
-            <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
-                <CardContent sx={{ padding: '0', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <CardHeader
-                        title={roomCode}
-                        subheader={date.toDateString()}
-                        sx={{ padding: '0' }}
-                    />
-                    <Divider />
-                    <CardContent 
-                        sx={{ padding: '0' }}
-                    >
-                        <Typography variant="body2" color="text.secondary">
-                            Votes: <Chip color="primary" label={votesToSkip} size="small" />
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Guest Can Pause: <Chip color="primary" label={guestCanPause.toString()} size="small" />
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Host: <Chip color="primary" label={guestCanPause.toString()} size="small" />
-                        </Typography>
+    if (showSettings) {
+        return renderSettings();
+    } else {
+        return (
+            <Card className='p-4 flex flex-col gap-4 rounded-lg shadow-lg transition-shadow hover:shadow-2xl' onClick={imageRandomizer}>
+                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+                    <CardContent sx={{ padding: '0', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <CardHeader
+                            action={
+                                <IconButton 
+                                    aria-label="settings" 
+                                    disabled={!isHost}
+                                    onClick={() => updateShowSettings(true)}
+                                >
+                                    <MoreVertIcon />
+                                </IconButton>
+                            }
+                            title={roomCode}
+                            subheader={date.toDateString()}
+                            sx={{ padding: '0' }}
+                        />
+                        <Divider />
+                        <CardContent 
+                            sx={{ padding: '0' }}
+                        >
+                            <Typography variant="body2" color="text.secondary">
+                                Votes: <Chip color="primary" label={votesToSkip} size="small" />
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Guest Can Pause: <Chip color="primary" label={guestCanPause.toString()} size="small" />
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Host: <Chip color="primary" label={guestCanPause.toString()} size="small" />
+                            </Typography>
+                        </CardContent>
                     </CardContent>
-                </CardContent>
-                <CardMedia
-                    component="img"
-                    sx={{ width: 200, height: 200, borderRadius: 1 }}
-                    image={imageRandomizer()}
-                    alt="Image placeholder"
-                />
-            </Box>
-            <Box>
-                <Button 
-                    startIcon={<ArrowBackRoundedIcon />} 
-                    variant="contained" 
-                    color="secondary" 
-                    className='w-100' 
-                    onClick={handleLeaveButtonPressed}
-                >
-                    LEAVE ROOM
-                </Button>
-            </Box>
-        </Card>
-    )
+                    <CardMedia
+                        component="img"
+                        sx={{ width: 200, height: 200, borderRadius: 1 }}
+                        image={imageRandomizer()}
+                        alt="Image placeholder"
+                    />
+                </Box>
+                <Box>
+                    <Button 
+                        startIcon={<ArrowBackRoundedIcon />} 
+                        variant="contained" 
+                        color="secondary" 
+                        className='w-100' 
+                        onClick={handleLeaveButtonPressed}
+                    >
+                        LEAVE ROOM
+                    </Button>
+                </Box>
+            </Card>
+        )
+    }
 }
