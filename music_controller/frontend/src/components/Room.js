@@ -72,25 +72,25 @@ export default function Room() {
 
     const renderSettings = () => {
         return (
-            <Grid container spacing={1}>\
+            <Grid container spacing={1}>
                 <Grid item xs={12} align="center">
                     <CreateRoomPage 
                         update={true} 
                         votesToSkip={votesToSkip} 
                         guestCanPause={guestCanPause} 
                         roomCode={roomCode}
-                        updateCallback={null}
+                        updateCallback={handleGetRoom}
+                        closeButton={
+                            <Button 
+                                variant="contained" 
+                                color="secondary" 
+                                className='w-100' 
+                                onClick={() => updateShowSettings(false)}
+                            >
+                                Close
+                            </Button>
+                        }
                     />
-                </Grid>
-                <Grid item xs={12} align="center">
-                    <Button 
-                        variant="contained" 
-                        color="secondary" 
-                        className='w-100' 
-                        onClick={() => updateShowSettings(false)}
-                    >
-                        Close
-                    </Button>
                 </Grid>
             </Grid>
         )
