@@ -12,24 +12,56 @@ import {
     Radio,
     RadioGroup,
     FormControlLabel,
+    Collapse,
+    Alert
 } from '@mui/material';
-
-export default function CreateRoomPage() {
+export default function CreateRoomPage({
+    votesToSkip = 2,
+    guestCanPause = true,
+    update = false,
+    roomCode = null,
+    closeButton = null,
+    updateCallback = () => {}
+}) {
     const navigate = useNavigate();
 
-    const [defaultVotes, setDefaultVotes] = useState(2)
-    const [guestCanPause, setGuestCanPause] = useState(true);
-    const [votesToSkip, setVotesToSkip] = useState(defaultVotes);
+    const [successMsg, setSuccessMsg] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+
+    const setTitle = () => {
+        return update ? "Update Room" : "Create a Room"
+    }
+
+    const setDefaultVotes = () => {
+        return votesToSkip === 2 ? 2 : votesToSkip
+    }
+
+    const setBackOrCloseBtn = () => {
+        if (closeButton) {
+            return closeButton;
+        } else {
+            const backButton = (
+                <Button color='secondary' variant='contained' className='w-100' to="/" component={Link}>
+                    Back
+                </Button>
+            );
+            return backButton;
+        }
+    };
 
     const handleVotesChange = (e) => {
-        setVotesToSkip(e.target.value);
+        votesToSkip = e.target.value;
     }
 
     const handleGuestCanPauseChange = (e) => {
-        setGuestCanPause(e.target.value === "true" ? true : false)
+        guestCanPause = e.target.value === "true" ? true : false
     }
 
     const handleRoomButtonPressed = async () => {
+        return update ? await updateRoom() : await createRoom();
+    };
+
+    const createRoom = async () => {
         try {
             const response = await axios.post("/api/create-room", {
                 votes_to_skip: votesToSkip,
@@ -46,12 +78,59 @@ export default function CreateRoomPage() {
         }
     }
 
+    const updateRoom = async () => {
+        try {
+            const response = await axios.patch("/api/update-room", {
+                votes_to_skip: votesToSkip,
+                guest_can_pause: guestCanPause,
+                code: roomCode
+            });
+
+            if (response.status == 200) {
+                setSuccessMsg("Room updated successfully!")
+                console.log(successMsg)
+            } else {
+                setSuccessMsg("Error updating room!")
+                console.log("Error updating room:", error); 
+            }
+        } catch (error) {
+            setSuccessMsg("Error updating room!")
+            console.log("Error updating room:", error);
+        }
+        updateCallback()
+    }
+
     return (
         <div className='flex justify-center'>
             <Grid container spacing={1} sm={6} md={4} className='p-4 rounded-lg shadow-lg transition-shadow hover:shadow-2xl'>
                 <Grid item xs={12} align="center">
+                    <Collapse 
+                        in={errorMsg != null || successMsg != null}
+                    >
+                        {successMsg != null ? (
+                            <Alert
+                                severity='success'
+                                onClose={() => {
+                                    setSuccessMsg(null)
+                                }}
+                            >
+                                {successMsg}
+                            </Alert>
+                        ) : (
+                            <Alert
+                                severity='error'
+                                onClose={() => {
+                                    setErrorMsg(null)
+                                }}
+                            >
+                                {errorMsg}
+                            </Alert>
+                        )}
+                    </Collapse>
+                </Grid>
+                <Grid item xs={12} align="center">
                     <Typography component="h4" variant="h4">
-                        Create A Room
+                        {setTitle()}
                     </Typography>
                 </Grid>
                 <Grid item xs={12} align="center">
@@ -61,7 +140,7 @@ export default function CreateRoomPage() {
                         </FormHelperText>
                         <RadioGroup 
                             row 
-                            defaultValue="true"
+                            defaultValue={guestCanPause}
                             onChange={handleGuestCanPauseChange}
                         >
                             <FormControlLabel  
@@ -84,7 +163,7 @@ export default function CreateRoomPage() {
                         <TextField
                             required={true}
                             type='number'
-                            defaultValue={defaultVotes}
+                            defaultValue={setDefaultVotes()}
                             inputProps={{
                                 min: 1,
                                 style: { textAlign: "center" },
@@ -100,15 +179,14 @@ export default function CreateRoomPage() {
                     <Button 
                         color='primary' 
                         variant='contained'
+                        className='w-100'
                         onClick={handleRoomButtonPressed}
                     >
-                        Create A Room
+                        {setTitle()}
                     </Button>
                 </Grid>
                 <Grid item xs={12} align="center">
-                    <Button color='secondary' variant='contained' to="/" component={Link}>
-                        Back
-                    </Button>
+                    {setBackOrCloseBtn()}
                 </Grid>
             </Grid>
         </div>

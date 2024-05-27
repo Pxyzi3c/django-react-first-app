@@ -29,7 +29,8 @@
         "@emotion/styled": "^11.11.5",
         "@fontsource/roboto": "^5.0.13",
         "@mui/icons-material": "^5.15.15",
-        "@mui/material": "^5.15.15",
+        "@mui/lab": "^5.0.0-alpha.170",
+        "@mui/material": "^5.15.18",
         "axios": "^1.6.8",
         "react-router-dom": "^6.23.0"
     }
