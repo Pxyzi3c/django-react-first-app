@@ -27,6 +27,7 @@ export default function Room() {
     const [guestCanPause, setGuestCanPause] = useState(false);
     const [isHost, setIsHost] = useState(false);
     const [showSettings, setShowSettings] = useState(false); 
+    const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
 
     const { roomCode } = useParams();
 
@@ -40,6 +41,21 @@ export default function Room() {
         } catch (error) {
             console.log("Error fetching room:", error);
         }
+    }
+
+    const authenticateSpotify = () => {
+        fetch("/spotify/is-authenticated")
+            .then((response) => response.json())
+            .then((data) => {
+                setSpotifyAuthenticated(data.status)
+                if (!data.status) {
+                    fetch('/spotify/get-auth-url')
+                        .then((response) => response.json())
+                        .then((data) => {
+                            window.location.replace(data.url)
+                        })
+                }
+            });
     }
 
     const imageRandomizer = () => {
@@ -100,6 +116,12 @@ export default function Room() {
         handleGetRoom();
     }, [roomCode]);
 
+    useEffect(() => {
+        if (isHost) {
+            authenticateSpotify()
+        }
+    }, [isHost])
+
     if (showSettings) {
         return renderSettings();
     } else {
@@ -132,7 +154,7 @@ export default function Room() {
                                 Guest Can Pause: <Chip color="primary" label={guestCanPause.toString()} size="small" />
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Host: <Chip color="primary" label={guestCanPause.toString()} size="small" />
+                                Host: <Chip color="primary" label={isHost.toString()} size="small" />
                             </Typography>
                         </CardContent>
                     </CardContent>
