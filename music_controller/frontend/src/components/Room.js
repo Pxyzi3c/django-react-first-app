@@ -27,6 +27,7 @@ export default function Room() {
     const [guestCanPause, setGuestCanPause] = useState(false);
     const [isHost, setIsHost] = useState(false);
     const [showSettings, setShowSettings] = useState(false); 
+    // SPOTIFY API
     const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
 
     const { roomCode } = useParams();
@@ -39,23 +40,22 @@ export default function Room() {
             setGuestCanPause(response.data.guest_can_pause)
             setIsHost(response.data.is_host)
         } catch (error) {
-            console.log("Error fetching room:", error);
+            console.log("Error fetching room: ", error)
         }
     }
 
-    const authenticateSpotify = () => {
-        fetch("/spotify/is-authenticated")
-            .then((response) => response.json())
-            .then((data) => {
-                setSpotifyAuthenticated(data.status)
-                if (!data.status) {
-                    fetch('/spotify/get-auth-url')
-                        .then((response) => response.json())
-                        .then((data) => {
-                            window.location.replace(data.url)
-                        })
-                }
-            });
+    const authenticateSpotify = async () => {
+        try {
+            const response = await axios.get("/spotify/is-authenticated")
+
+            setSpotifyAuthenticated(response.data.status);
+            if (!response.data.status) {
+                const authUrlResponse = await axios.get("/spotify/get-auth-url");
+                window.location.replace(authUrlResponse.data.url)
+            }
+        } catch (error) {
+            console.log("Spotify authentication error: ", error)
+        }
     }
 
     const imageRandomizer = () => {
