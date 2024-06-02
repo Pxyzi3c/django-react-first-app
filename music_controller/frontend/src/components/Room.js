@@ -27,6 +27,8 @@ export default function Room() {
     const [guestCanPause, setGuestCanPause] = useState(false);
     const [isHost, setIsHost] = useState(false);
     const [showSettings, setShowSettings] = useState(false); 
+    // SPOTIFY API
+    const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
 
     const { roomCode } = useParams();
 
@@ -38,7 +40,21 @@ export default function Room() {
             setGuestCanPause(response.data.guest_can_pause)
             setIsHost(response.data.is_host)
         } catch (error) {
-            console.log("Error fetching room:", error);
+            console.log("Error fetching room: ", error)
+        }
+    }
+
+    const authenticateSpotify = async () => {
+        try {
+            const response = await axios.get("/spotify/is-authenticated")
+
+            setSpotifyAuthenticated(response.data.status);
+            if (!response.data.status) {
+                const authUrlResponse = await axios.get("/spotify/get-auth-url");
+                window.location.replace(authUrlResponse.data.url)
+            }
+        } catch (error) {
+            console.log("Spotify authentication error: ", error)
         }
     }
 
@@ -100,6 +116,12 @@ export default function Room() {
         handleGetRoom();
     }, [roomCode]);
 
+    useEffect(() => {
+        if (isHost) {
+            authenticateSpotify()
+        }
+    }, [isHost])
+
     if (showSettings) {
         return renderSettings();
     } else {
@@ -132,7 +154,7 @@ export default function Room() {
                                 Guest Can Pause: <Chip color="primary" label={guestCanPause.toString()} size="small" />
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Host: <Chip color="primary" label={guestCanPause.toString()} size="small" />
+                                Host: <Chip color="primary" label={isHost.toString()} size="small" />
                             </Typography>
                         </CardContent>
                     </CardContent>
