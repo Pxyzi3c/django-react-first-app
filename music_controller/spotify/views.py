@@ -77,7 +77,7 @@ class CurrentSong(APIView):
         response = execute_spotify_api_request(host, endpoint)
 
         if 'error' in response or 'item' not in response:
-            return Response({}, status=status.HTTP_204_NO_CONTENT)
+            return Response(response.get('error') or {}, status=status.HTTP_204_NO_CONTENT)
         
         item = response.get('item')
         duration = item.get('duration_ms')
@@ -88,7 +88,7 @@ class CurrentSong(APIView):
 
         artist_string = ""
 
-        for i, artist in enumerate(item.get('artist')):
+        for i, artist in enumerate(item.get('artists')):
             if i > 0:
                 artist_string += ", "
             name = artist.get('name')
@@ -106,3 +106,9 @@ class CurrentSong(APIView):
         }
 
         return Response(song, status=status.HTTP_200_OK)
+    
+"""
+TIME STAMP: 27:00
+- Error with expired access token
+- Fixing error with the "is authenticated"
+"""

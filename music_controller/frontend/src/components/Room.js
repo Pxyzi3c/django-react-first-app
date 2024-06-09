@@ -29,6 +29,7 @@ export default function Room() {
     const [showSettings, setShowSettings] = useState(false); 
     // SPOTIFY API
     const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
+    const [song, setSong] = useState(null)
 
     const { roomCode } = useParams();
 
@@ -57,6 +58,16 @@ export default function Room() {
             console.log("Spotify authentication error: ", error)
         }
     }
+
+    // const getCurrentSong = async () => {
+    //     try {
+    //         const response = await axios.get('/spotify/current-song')
+
+    //         console.log(response)
+    //     } catch (error) {
+    //         console.log("Failed loading current song", error)
+    //     }
+    // }
 
     const handleLeaveButtonPressed = async () => {
         try {
@@ -118,7 +129,7 @@ export default function Room() {
 
     useEffect(() => {
         if (isHost) {
-            authenticateSpotify()
+            authenticateSpotify();
         }
     }, [isHost])
 
