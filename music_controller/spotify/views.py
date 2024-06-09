@@ -30,13 +30,13 @@ class SpotifyCallbackView(APIView):
 
         if error:
             return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
-
+    
         response = post('https://accounts.spotify.com/api/token', data={
             'grant_type': 'authorization_code',
             'code': code,
             'redirect_uri': os.environ.get('SPOTIFY_REDIRECT_URL'),
             'client_id': os.environ.get('SPOTIFY_CLIENT_ID'),
-            'client_id': os.environ.get('SPOTIFY_CLIENT_SECRET')
+            'client_secret': os.environ.get('SPOTIFY_CLIENT_SECRET')
         })
 
         response_data = response.json()
@@ -73,8 +73,36 @@ class CurrentSong(APIView):
         else:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         host = room.host
-        endpoint = "/player/currently-playing"
+        endpoint = "player/currently-playing"
         response = execute_spotify_api_request(host, endpoint)
-        print(response)
 
-        return Response(response, status=status.HTTP_200_OK)
+        if 'error' in response or 'item' not in response:
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+        
+        item = response.get('item')
+        duration = item.get('duration_ms')
+        progress = response.get('progress_ms')
+        album_cover = item.get('album').get('images')[0].get('url')
+        is_playing = response.get('is_playing')
+        song_id = item.get('id')
+
+        artist_string = ""
+
+        for i, artist in enumerate(item.get('artist')):
+            if i > 0:
+                artist_string += ", "
+            name = artist.get('name')
+            artist_string += name
+
+        song = {
+            'title': item.get('name'),
+            'artist': artist_string,
+            'duration': duration,
+            'time': progress,
+            'image_url': album_cover,
+            'is_playing': is_playing,
+            'votes': 0,
+            'id': song_id
+        }
+
+        return Response(song, status=status.HTTP_200_OK)

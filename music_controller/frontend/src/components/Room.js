@@ -58,16 +58,6 @@ export default function Room() {
         }
     }
 
-    const imageRandomizer = () => {
-        var length = 8,
-        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-        retVal = "";
-        for (var i = 0, n = charset.length; i < length; ++i) {
-            retVal += charset.charAt(Math.floor(Math.random() * n));
-        }
-        return `https://picsum.photos/seed/${retVal}/200/300`;
-    }
-
     const handleLeaveButtonPressed = async () => {
         try {
             const response = await axios.post("/api/leave-room", {
@@ -80,6 +70,16 @@ export default function Room() {
         } catch (error) {
             console.log("Error leaving the room:", error);
         }
+    }
+
+    const imageRandomizer = () => {
+        var length = 8,
+        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        retVal = "";
+        for (var i = 0, n = charset.length; i < length; ++i) {
+            retVal += charset.charAt(Math.floor(Math.random() * n));
+        }
+        return `https://picsum.photos/seed/${retVal}/200/300`;
     }
 
     const updateShowSettings = (value) => {
