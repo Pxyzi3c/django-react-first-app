@@ -13,11 +13,12 @@ import {
     Chip, 
     Button,
     Grid,
+    IconButton
 } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import IconButton from '@mui/material/IconButton';
 import CreateRoomPage from "./CreateRoomPage";
+import MusicPlayer from './MusicPlayer';
 
 export default function Room() {
     const navigate = useNavigate();
@@ -29,6 +30,7 @@ export default function Room() {
     const [showSettings, setShowSettings] = useState(false); 
     // SPOTIFY API
     const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
+    const [currentSong, setCurrentSong] = useState(null)
 
     const { roomCode } = useParams();
 
@@ -58,14 +60,14 @@ export default function Room() {
         }
     }
 
-    const imageRandomizer = () => {
-        var length = 8,
-        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-        retVal = "";
-        for (var i = 0, n = charset.length; i < length; ++i) {
-            retVal += charset.charAt(Math.floor(Math.random() * n));
+    const getCurrentSong = async () => {
+        try {
+            const response = await axios.get('/spotify/current-song')
+
+            setCurrentSong(response.data)
+        } catch (error) {
+            console.log("Failed loading current song", error)
         }
-        return `https://picsum.photos/seed/${retVal}/200/300`;
     }
 
     const handleLeaveButtonPressed = async () => {
@@ -80,6 +82,16 @@ export default function Room() {
         } catch (error) {
             console.log("Error leaving the room:", error);
         }
+    }
+
+    const imageRandomizer = () => {
+        var length = 8,
+        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        retVal = "";
+        for (var i = 0, n = charset.length; i < length; ++i) {
+            retVal += charset.charAt(Math.floor(Math.random() * n));
+        }
+        return `https://picsum.photos/seed/${retVal}/200/300`;
     }
 
     const updateShowSettings = (value) => {
@@ -114,11 +126,17 @@ export default function Room() {
 
     useEffect(() => {
         handleGetRoom();
-    }, [roomCode]);
+        if (spotifyAuthenticated) {
+            getCurrentSong();
+
+            const intervalId = setInterval(getCurrentSong, 1000);
+            return () => clearInterval(intervalId);
+        }
+    }, [roomCode, spotifyAuthenticated]);
 
     useEffect(() => {
         if (isHost) {
-            authenticateSpotify()
+            authenticateSpotify();
         }
     }, [isHost])
 
@@ -161,10 +179,11 @@ export default function Room() {
                     <CardMedia
                         component="img"
                         sx={{ width: 200, height: 200, borderRadius: 1 }}
-                        image={imageRandomizer()}
+                        image={currentSong?.image_url ?? imageRandomizer()}
                         alt="Image placeholder"
                     />
                 </Box>
+                <MusicPlayer songDetails={currentSong ?? {}} />
                 <Box>
                     <Button 
                         startIcon={<ArrowBackRoundedIcon />} 
