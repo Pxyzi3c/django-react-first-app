@@ -106,9 +106,3 @@ class CurrentSong(APIView):
         }
 
         return Response(song, status=status.HTTP_200_OK)
-    
-"""
-TIME STAMP: 27:00
-- Error with expired access token
-- Fixing error with the "is authenticated"
-"""

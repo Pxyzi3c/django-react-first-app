@@ -13,11 +13,12 @@ import {
     Chip, 
     Button,
     Grid,
+    IconButton
 } from '@mui/material';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import IconButton from '@mui/material/IconButton';
 import CreateRoomPage from "./CreateRoomPage";
+import MusicPlayer from './MusicPlayer';
 
 export default function Room() {
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ export default function Room() {
     const [showSettings, setShowSettings] = useState(false); 
     // SPOTIFY API
     const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
-    const [song, setSong] = useState(null)
+    const [currentSong, setCurrentSong] = useState(null)
 
     const { roomCode } = useParams();
 
@@ -59,15 +60,15 @@ export default function Room() {
         }
     }
 
-    // const getCurrentSong = async () => {
-    //     try {
-    //         const response = await axios.get('/spotify/current-song')
+    const getCurrentSong = async () => {
+        try {
+            const response = await axios.get('/spotify/current-song')
 
-    //         console.log(response)
-    //     } catch (error) {
-    //         console.log("Failed loading current song", error)
-    //     }
-    // }
+            setCurrentSong(response.data)
+        } catch (error) {
+            console.log("Failed loading current song", error)
+        }
+    }
 
     const handleLeaveButtonPressed = async () => {
         try {
@@ -125,7 +126,13 @@ export default function Room() {
 
     useEffect(() => {
         handleGetRoom();
-    }, [roomCode]);
+        if (spotifyAuthenticated) {
+            getCurrentSong();
+
+            const intervalId = setInterval(getCurrentSong, 1000);
+            return () => clearInterval(intervalId);
+        }
+    }, [roomCode, spotifyAuthenticated]);
 
     useEffect(() => {
         if (isHost) {
@@ -172,10 +179,11 @@ export default function Room() {
                     <CardMedia
                         component="img"
                         sx={{ width: 200, height: 200, borderRadius: 1 }}
-                        image={imageRandomizer()}
+                        image={currentSong?.image_url ?? imageRandomizer()}
                         alt="Image placeholder"
                     />
                 </Box>
+                <MusicPlayer songDetails={currentSong ?? {}} />
                 <Box>
                     <Button 
                         startIcon={<ArrowBackRoundedIcon />} 
