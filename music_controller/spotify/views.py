@@ -61,8 +61,12 @@ class SpotifyCallbackView(APIView):
 
 class IsAuthenticated(APIView):
     def get(self, request, format=None):
-        is_authenticated = is_spotify_authenticated(self.request.session.session_key)
-        return Response({'status': is_authenticated}, status=status.HTTP_200_OK)
+        try:
+            is_authenticated = is_spotify_authenticated(self.request.session.session_key)
+            return Response({'status': is_authenticated, }, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"Error checking Spotify authentication: {e}")
+            return Response({'error': 'Error checking Spotify authentication'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CurrentSong(APIView):
     def get(self, request, format=None):
