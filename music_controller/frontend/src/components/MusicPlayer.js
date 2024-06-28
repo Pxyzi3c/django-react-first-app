@@ -15,6 +15,7 @@ import {
     Grid,
     IconButton,
     LinearProgress,
+    Collapse
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
@@ -28,40 +29,71 @@ export default function MusicPlayer({ songDetails }) {
         if (songDetails.duration > 0) {
             setSongProgress((songDetails.time / songDetails.duration) * 100);
         }
-    }, [songDetails]); // Dependency on songDetails to trigger recalculation
+    }, [songDetails]);
     
     return (
-        <Card>
-            <Grid container alignItems='center'>
-                <Grid item align="center" xs={4}>
-                    <CardMedia
-                        component="img"
-                        sx={{ width: '100%', height: '100%', borderRadius: 1 }}
-                        image={songDetails.image_url}
-                        alt="image placeholder"
-                    />
-                </Grid>
-                <Grid item align="center" xs={8}>
-                    <Typography component="h5" variant="h5">
-                        {songDetails.title}
-                    </Typography>
-                    <Typography color="textSecondary" variant="subtitle1">
-                        {songDetails.artist}
-                    </Typography>
-                    <div>
-                        <IconButton>
-                            { songDetails.is_playing ? <PauseIcon /> : <PlayArrowIcon /> }
-                        </IconButton>
-                        <IconButton>
-                            <SkipNextIcon />
-                        </IconButton>
-                    </div>
-                </Grid>
-            </Grid>
-            <LinearProgress variant='determinate' value={songProgress} />
-        </Card>
+        <Card 
+            sx={{ position: 'relative' }}
+        >
+            <CardMedia
+                component="img"
+                sx={{ width: 200, height: 200, borderRadius: 1 }}
+                image={songDetails.image_url ?? 'https://via.placeholder.com/200x200'}
+                alt="Loading Image"
+            />
+            <CardContent 
+                sx={{ 
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column', 
+                    textAlign: 'center', 
+                    position: 'absolute', 
+                    top: '0', 
+                    left: '0', 
+                    color: 'white',
+                    padding: '0 !important',
+                    height: '100%',
+                    opacity: '0',
+                    ":hover": {
+                        opacity: '1',
+                        transition: 'all 100ms ease-in-out',
+                    }
+                }}
+            >
+                <Box sx={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    background: 'rgba(0, 0, 0, 0.4)',
+                    height: '75%',
+                }}>
+                    <CardContent sx={{ flex: '1 0 auto' }}>
+                        <Typography component="div" variant="h5">
+                            {songDetails.title}
+                        </Typography>
+                        <Typography variant="subtitle1" component="div">
+                            {songDetails.artist}
+                        </Typography>
+                    </CardContent>
+                </Box>
+
+                <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    justifyContent: 'space-around',
+                    background: 'rgba(0, 0, 0, 0.75)',
+                    height: '25%',
+                }}>
+                    <IconButton aria-label="previous" sx={{ color: 'white' }}>
+                        <SkipPreviousIcon />
+                    </IconButton>
+                    <IconButton aria-label="play/pause" sx={{ color: 'white' }}>
+                        {songDetails?.is_playing ? <PauseIcon /> : <PlayArrowIcon/>}
+                    </IconButton>
+                    <IconButton aria-label="next" sx={{ color: 'white' }}>
+                        <SkipNextIcon />
+                    </IconButton>
+                </Box>
+            </CardContent>
+        </Card>    
     )
 }
-
-// TIMESTAMP:
-// 38:00

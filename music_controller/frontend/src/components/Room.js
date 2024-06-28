@@ -176,14 +176,8 @@ export default function Room() {
                             </Typography>
                         </CardContent>
                     </CardContent>
-                    <CardMedia
-                        component="img"
-                        sx={{ width: 200, height: 200, borderRadius: 1 }}
-                        image={currentSong?.image_url ?? imageRandomizer()}
-                        alt="Image placeholder"
-                    />
+                    <MusicPlayer songDetails={currentSong ?? {}} />
                 </Box>
-                <MusicPlayer songDetails={currentSong ?? {}} />
                 <Box>
                     <Button 
                         startIcon={<ArrowBackRoundedIcon />} 
