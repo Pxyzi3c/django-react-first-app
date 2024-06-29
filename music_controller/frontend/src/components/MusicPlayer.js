@@ -15,7 +15,6 @@ import {
     Grid,
     IconButton,
     LinearProgress,
-    Collapse
 } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
@@ -24,6 +23,16 @@ import PauseIcon from '@mui/icons-material/Pause';
 
 export default function MusicPlayer({ songDetails }) {
     const [songProgress, setSongProgress] = useState(0);
+
+    const pauseOrPlaySong = async (action) => {
+        try {
+            const response = await axios.put("/spotify/pause-play-song", {
+                action: action
+            })
+        } catch (error) {
+            console.log(`Action error (${action}): `, error)
+        }
+    }
 
     useEffect(() => {
         if (songDetails.duration > 0) {
@@ -54,9 +63,10 @@ export default function MusicPlayer({ songDetails }) {
                     padding: '0 !important',
                     height: '100%',
                     opacity: '0',
+                    transition: 'all 200ms ease-in-out',
+                    overflow: 'hidden',
                     ":hover": {
                         opacity: '1',
-                        transition: 'all 100ms ease-in-out',
                     }
                 }}
             >
@@ -86,14 +96,24 @@ export default function MusicPlayer({ songDetails }) {
                     <IconButton aria-label="previous" sx={{ color: 'white' }}>
                         <SkipPreviousIcon />
                     </IconButton>
-                    <IconButton aria-label="play/pause" sx={{ color: 'white' }}>
-                        {songDetails?.is_playing ? <PauseIcon /> : <PlayArrowIcon/>}
+                    <IconButton 
+                        aria-label="play/pause" 
+                        sx={{ color: 'white' }}
+                        onClick={() => { songDetails?.is_playing ? pauseOrPlaySong("pause") : pauseOrPlaySong("play") }}
+                    >
+                        {songDetails?.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
                     </IconButton>
                     <IconButton aria-label="next" sx={{ color: 'white' }}>
                         <SkipNextIcon />
                     </IconButton>
                 </Box>
             </CardContent>
+            <LinearProgress sx={{ 
+                position: 'absolute', 
+                bottom: '0', 
+                left: '0', 
+                width: '100%',
+            }} color='primary' variant='determinate' value={songProgress} />
         </Card>    
     )
 }
