@@ -8,7 +8,7 @@ from .util import *
 from api.models import Room
 import os
 
-scopes = 'app-remote-control streaming user-read-playback-state user-modify-playback-state user-read-currently-playing'
+scopes = 'app-remote-control streaming user-read-playback-state user-modify-playback-state user-read-response = currently-playing'
 
 class AuthAURL(APIView):
     def get(self, request, format=None):
@@ -110,21 +110,42 @@ class CurrentSong(APIView):
         }
 
         return Response(song, status=status.HTTP_200_OK)
-    
-class ControlSong(APIView):
-    def put(self, request, format=None):
-        action = self.request.data.get('action')
-        if action not in ('play', 'pause'):
-            return Response({'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            room = Room.objects.get(code=self.request.session.get('room_code'))
-        except Room.DoesNotExist:
-            return Response({'error': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
+# todo: Simplied class for pause and play. Uncomment this if pause and play are working    
+# class ControlSong(APIView):
+#     def put(self, request, format=None):
+#         action = self.request.data.get('action')
+#         if action not in ('play', 'pause'):
+#             return Response({'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         try:
+#             room = Room.objects.get(code=self.request.session.get('room_code'))
+#         except Room.DoesNotExist:
+#             return Response({'error': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
         
+#         if self.request.session.session_key == room.host or room.guest_can_pause:
+#             execute_song_action(room.host, action)
+
+#             return Response({'success': True}, status=status.HTTP_200_OK)
+        
+#         return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+class PauseSong(APIView):
+    def put(self, response, format=None):
+        room_code = self.request.session.get('room_code')
+        room = Room.objects.filter(code=room_code)[0]
         if self.request.session.session_key == room.host or room.guest_can_pause:
-            execute_song_action(room.host, action)
-                
+            pause_song(room.host)
             return Response({'success': True}, status=status.HTTP_204_NO_CONTENT)
+
+        return Response({}, status=status.HTTP_403_FORBIDDEN)
+    
+class PlaySong(APIView):
+    def put(self, response, format=None):
+        room_code = self.request.session.get('room_code')
+        room = Room.objects.filter(code=room_code)[0]
+        if self.request.session.session_key == room.host or room.guest_can_pause:
+            play_song(room.host)
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
         
         return Response({}, status=status.HTTP_403_FORBIDDEN)
