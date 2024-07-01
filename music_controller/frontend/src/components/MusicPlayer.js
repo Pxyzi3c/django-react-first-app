@@ -23,21 +23,32 @@ import PauseIcon from '@mui/icons-material/Pause';
 
 export default function MusicPlayer({ songDetails }) {
     const [songProgress, setSongProgress] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(false);
 
-    const pauseOrPlaySong = async (action) => {
+    const pauseSong = async () => {
         try {
-            const response = await axios.put("/spotify/pause-play-song", {
-                action: action
-            })
+            const response = await axios.put("/spotify/pause-song")
+
+            console.log(response)
         } catch (error) {
-            console.log(`Action error (${action}): `, error)
+            console.log("Error pausing the song: ", error)
+        }
+    }
+
+    const playSong = async () => {
+        try {
+            const response = await axios.put("/spotify/play-song")
+
+        } catch (error) {
+            console.log("Error playing the song: ", error)
         }
     }
 
     useEffect(() => {
         if (songDetails.duration > 0) {
             setSongProgress((songDetails.time / songDetails.duration) * 100);
-        }
+        } 
+        setIsPlaying(songDetails.is_playing);
     }, [songDetails]);
     
     return (
@@ -99,7 +110,9 @@ export default function MusicPlayer({ songDetails }) {
                     <IconButton 
                         aria-label="play/pause" 
                         sx={{ color: 'white' }}
-                        onClick={() => { songDetails?.is_playing ? pauseOrPlaySong("pause") : pauseOrPlaySong("play") }}
+                        onClick={() => { 
+                            songDetails?.is_playing ? pauseSong() : playSong() 
+                        }}
                     >
                         {songDetails?.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
                     </IconButton>

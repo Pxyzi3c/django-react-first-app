@@ -54,6 +54,8 @@ def refresh_spotify_token(session_id):
 
     update_or_create_user_tokens(session_id, access_token, token_type, expires_in, refresh_token)
 
+# TODO: MAJOR REVISIONS TO BE MADE - CLASS BASED IMPLEMENTATION INSTEAD OF SEPARATE FUNCTIONS
+
 def execute_spotify_api_request(session_id, endpoint, post_=False, put_=False):
     tokens = get_user_tokens(session_id)
     headers = {
@@ -62,16 +64,19 @@ def execute_spotify_api_request(session_id, endpoint, post_=False, put_=False):
     }
 
     if post_:
-        post(BASE_URL + endpoint, headers=headers)
-    if put_:
-        put(BASE_URL + endpoint, headers=headers)
-
-    response = get(BASE_URL + endpoint, {}, headers=headers)
+        response = post(BASE_URL + endpoint, headers=headers)
+    elif put_:
+        response = put(BASE_URL + endpoint, headers=headers)
+    else:
+        response = get(BASE_URL + endpoint, {}, headers=headers)
 
     try:
         return response.json()
-    except:
-        return {'Error': 'Issue with request'}
+    except Exception as e:
+        return {'Error': str(e)}
+    
+def play_song(session_id):
+    return execute_spotify_api_request(session_id, "player/play", put_=True)
 
-def execute_song_action(session_id, action):
-    return execute_spotify_api_request(session_id, f'player/{action}', put_=True)
+def pause_song(session_id):
+    return execute_spotify_api_request(session_id, "player/pause", put_=True)
