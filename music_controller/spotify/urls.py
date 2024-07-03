@@ -2,11 +2,10 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('get-auth-url', AuthAURL.as_view()),
-    path('redirect', SpotifyCallbackView.as_view()),
-    path('is-authenticated', IsAuthenticated.as_view()),
-    path('current-song', CurrentSong.as_view()),
-    # path('pause-play-song', ControlSong.as_view()),
-    path('pause-song', PauseSong.as_view()),
-    path('play-song', PlaySong.as_view()),
+    path('get-auth-url', SpotifyAPI.get_authenticate),
+    path('redirect', SpotifyAPI.get_spotify_callback_view),
+    path('is-authenticated', SpotifyAPI.is_authenticated),
+    path('current-song', SpotifyAPI.get_current_song),
+    path('pause-song', SpotifyAPI.pause_song),
+    path('play-song', SpotifyAPI.play_song),
 ]
