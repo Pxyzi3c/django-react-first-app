@@ -24,6 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-&+9$q68ld$831pdtr&fw%4a&8(3&2-7-*qg$tnd5u2ass-swrl'
+SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
+SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
+SPOTIFY_REDIRECT_URL = os.getenv('SPOTIFY_REDIRECT_URL')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
