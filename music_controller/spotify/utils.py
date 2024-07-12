@@ -1,7 +1,7 @@
 from .models import SpotifyToken
 from django.utils import timezone
 from datetime import timedelta
-from requests import post, put, get
+import requests
 import os
 
 BASE_URL = "https://api.spotify.com/v1/me/"
@@ -41,7 +41,7 @@ def is_spotify_authenticated(session_id):
 def refresh_spotify_token(session_id):
     refresh_token = get_user_tokens(session_id).refresh_token
 
-    response = post('https://accounts.spotify.com/api/token', data={
+    response = requests.post('https://accounts.spotify.com/api/token', data={
         'grant_type': 'refresh_token',
         'refresh_token': refresh_token,
         'client_id': os.environ.get('SPOTIFY_CLIENT_ID'),
@@ -58,15 +58,14 @@ def refresh_spotify_token(session_id):
 
 def execute_spotify_api_request(session_id, endpoint, post_=False, put_=False):
     tokens = get_user_tokens(session_id)
-    headers = {'Content-Type': 'application/json',
-               'Authorization': "Bearer " + tokens.access_token}
+    headers = {'Authorization': f"Bearer {tokens.access_token}"}
 
     if post_:
-        post(BASE_URL + endpoint, headers=headers)
+        requests.post(BASE_URL + endpoint, headers=headers)
     if put_:
-        put(BASE_URL + endpoint, headers=headers)
+        requests.put(BASE_URL + endpoint, headers=headers)
 
-    response = get(BASE_URL + endpoint, {}, headers=headers)
+    response = requests.get(BASE_URL + endpoint, {}, headers=headers)
     
     try:
         return response.json()
@@ -74,7 +73,21 @@ def execute_spotify_api_request(session_id, endpoint, post_=False, put_=False):
         return {'Error': 'Issue with request'}
     
 def play_song(session_id):
-    return execute_spotify_api_request(session_id, "player/play", put_=True)
+    access_token = get_user_tokens(session_id).access_token
+    url = f"{BASE_URL}player/play"
+
+    response = requests.put(url, {}, headers={
+        "Authorization": f"Bearer {access_token}"
+    })
+
+    return response
 
 def pause_song(session_id):
-    return execute_spotify_api_request(session_id, "player/pause", put_=True)
+    access_token = get_user_tokens(session_id).access_token
+    url = f"{BASE_URL}player/pause"
+
+    response = requests.put(url, {}, headers={
+        'Authorization': f'Bearer {access_token}'
+    })
+
+    return response
