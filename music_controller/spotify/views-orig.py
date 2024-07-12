@@ -1,8 +1,9 @@
-import requests
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.response import Response
 
+from requests import Request, post
+import requests
 from .utils import *
 from api.models import Room
 from django.conf import settings
@@ -10,8 +11,8 @@ from django.shortcuts import render, redirect
 
 SPOTIFY_SCOPES = [
     "user-read-currently-playing",
-    "user-modify-playback-state",
     "user-read-playback-state",
+    "user-modify-playback-state",
     "user-read-private",
     "playlist-read-private",
     "app-remote-control",
@@ -20,46 +21,39 @@ SPOTIFY_SCOPES = [
 
 class AuthSpotify(APIView):
     def get(self, request):
-        url = self.generate_spotify_url()
+        url = self.generate_spotify_url();
         return Response({'url': url}, status=status.HTTP_200_OK)
     
     def generate_spotify_url(self):
-        base_url = 'https://accounts.spotify.com/authorize'
-        redirect_url = settings.SPOTIFY_REDIRECT_URL
-        client_id = settings.SPOTIFY_CLIENT_ID
-
-        return requests.Request('GET', base_url, params={
-                'scope': ' '.join(SPOTIFY_SCOPES),
+        return Request('GET', 'https://accounts.spotify.com/authorize', params={
+                'scope': SPOTIFY_SCOPES,
                 'response_type': 'code',
-                'redirect_uri': redirect_url,
-                'client_id': client_id
+                'redirect_uri': settings.SPOTIFY_REDIRECT_URL,
+                'client_id': settings.SPOTIFY_CLIENT_ID
         }).prepare().url
 
 class SpotifyCallback(APIView):
-    def get(self, request):
-        code = request.query_params.get('code')
-        error = request.query_params.get('error')
-        token_url = 'https://accounts.spotify.com/api/token'
-        client_id = settings.SPOTIFY_CLIENT_ID
-        client_secret = settings.SPOTIFY_CLIENT_SECRET
-        redirect_url = settings.SPOTIFY_REDIRECT_URL
+    def get(self, request, format=None):
+        code = request.GET.get('code')
+        error = request.GET.get('error')
 
         if error:
             return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
     
-        response = requests.post(token_url, data={
+        response = post('https://accounts.spotify.com/api/token', data={
             'grant_type': 'authorization_code',
             'code': code,
-            'redirect_uri': redirect_url,
-            'client_id': client_id,
-            'client_secret': client_secret
+            'redirect_uri': settings.SPOTIFY_REDIRECT_URL,
+            'client_id': settings.SPOTIFY_CLIENT_ID,
+            'client_secret': settings.SPOTIFY_CLIENT_SECRET
         })
 
-        token_info = response.json()
-        access_token = token_info['access_token']
-        token_type = token_info['token_type']
-        refresh_token = token_info['refresh_token']
-        expires_in = token_info['expires_in']
+        response_data = response.json()
+        access_token = response_data.get('access_token')
+        token_type = response_data.get('token_type')
+        refresh_token = response_data.get('refresh_token')
+        expires_in = response_data.get('expires_in')
+        error = response_data.get('error')
 
         if not request.session.exists(request.session.session_key):
             request.session.create()
@@ -126,28 +120,41 @@ class CurrentSong(APIView):
 
         return Response(song, status=status.HTTP_200_OK)
 
+# todo: Simplied class for pause and play. Uncomment this if pause and play are working    
+# class ControlSong(APIView):
+#     def put(self, request, format=None):
+#         action = self.request.data.get('action')
+#         if action not in ('play', 'pause'):
+#             return Response({'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         try:
+#             room = Room.objects.get(code=self.request.session.get('room_code'))
+#         except Room.DoesNotExist:
+#             return Response({'error': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+#         if self.request.session.session_key == room.host or room.guest_can_pause:
+#             execute_song_action(room.host, action)
+
+#             return Response({'success': True}, status=status.HTTP_200_OK)
+        
+#         return Response({}, status=status.HTTP_403_FORBIDDEN)
+
 class PauseSong(APIView):
     def put(self, response, format=None):
         room_code = self.request.session.get('room_code')
         room = Room.objects.filter(code=room_code)[0]
         if self.request.session.session_key == room.host or room.guest_can_pause:
-            res = pause_song(room.host)
-            if res.status_code == 204:
-                return Response({}, status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({}, status=res.status_code)
+            pause_song(room.host)
+            return Response({'success': True}, status=status.HTTP_204_NO_CONTENT)
 
         return Response({}, status=status.HTTP_403_FORBIDDEN)
     
 class PlaySong(APIView):
-    def put(self, response):
+    def put(self, response, format=None):
         room_code = self.request.session.get('room_code')
         room = Room.objects.filter(code=room_code)[0]
         if self.request.session.session_key == room.host or room.guest_can_pause:
-            res = play_song(room.host)
-            if res.status_code == 204:
-                return Response({}, status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({}, status=res.status_code)
+            play_song(room.host)
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
         
         return Response({}, status=status.HTTP_403_FORBIDDEN)
