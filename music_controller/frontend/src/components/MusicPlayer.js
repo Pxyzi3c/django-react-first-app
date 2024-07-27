@@ -25,6 +25,16 @@ export default function MusicPlayer({ songDetails }) {
     const [songProgress, setSongProgress] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
 
+    const skipSong = async () => {
+        try {
+            const response = await axios.post("/spotify/skip")
+
+            console.log(response)
+        } catch (error) {
+            console.log("Error skipping the song: ", error)
+        }
+    }
+
     const pauseSong = async () => {
         try {
             const response = await axios.put("/spotify/pause-song")
@@ -116,7 +126,13 @@ export default function MusicPlayer({ songDetails }) {
                     >
                         {songDetails?.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
                     </IconButton>
-                    <IconButton aria-label="next" sx={{ color: 'white' }}>
+                    <IconButton 
+                        aria-label="next" 
+                        sx={{ 
+                            color: 'white' 
+                        }}
+                        onClick={() => skipSong()}
+                    >
                         <SkipNextIcon />
                     </IconButton>
                 </Box>

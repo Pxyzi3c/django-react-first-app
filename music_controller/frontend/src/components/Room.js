@@ -166,7 +166,7 @@ export default function Room() {
                             sx={{ padding: '0' }}
                         >
                             <Typography variant="body2" color="text.secondary">
-                                Votes: <Chip color="primary" label={votesToSkip} size="small" />
+                                Votes: <Chip color="primary" label={`${currentSong?.votes} / ${currentSong?.votes_required}`} size="small" />
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
                                 Guest Can Pause: <Chip color="primary" label={guestCanPause.toString()} size="small" />
