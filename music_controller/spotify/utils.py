@@ -54,11 +54,10 @@ def refresh_spotify_token(session_id):
 
     update_or_create_user_tokens(session_id, access_token, token_type, expires_in, refresh_token)
 
-# TODO: MAJOR REVISIONS TO BE MADE - CLASS BASED IMPLEMENTATION INSTEAD OF SEPARATE FUNCTIONS
-
 def execute_spotify_api_request(session_id, endpoint, post_=False, put_=False):
     tokens = get_user_tokens(session_id)
-    headers = {'Authorization': f"Bearer {tokens.access_token}"}
+    headers = {'Content-type': 'application/json',
+               'Authorization': f"Bearer {tokens.access_token}"}
 
     if post_:
         requests.post(BASE_URL + endpoint, headers=headers)
@@ -73,21 +72,10 @@ def execute_spotify_api_request(session_id, endpoint, post_=False, put_=False):
         return {'Error': 'Issue with request'}
     
 def play_song(session_id):
-    access_token = get_user_tokens(session_id).access_token
-    url = f"{BASE_URL}player/play"
-
-    response = requests.put(url, {}, headers={
-        "Authorization": f"Bearer {access_token}"
-    })
-
-    return response
+    return execute_spotify_api_request(session_id, "player/play", put_=True)
 
 def pause_song(session_id):
-    access_token = get_user_tokens(session_id).access_token
-    url = f"{BASE_URL}player/pause"
+    return execute_spotify_api_request(session_id, "player/pause", put_=True)
 
-    response = requests.put(url, {}, headers={
-        'Authorization': f'Bearer {access_token}'
-    })
-
-    return response
+def skip_song(session_id):
+    return execute_spotify_api_request(session_id, "player/next", post_=True)
