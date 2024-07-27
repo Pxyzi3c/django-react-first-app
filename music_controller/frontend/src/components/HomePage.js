@@ -15,6 +15,7 @@ import {
     Typography,
     ButtonGroup,
 } from '@mui/material';
+import Info from './Info';
 import axios from 'axios';
 
 export default function HomePage() {
@@ -43,6 +44,9 @@ export default function HomePage() {
                         <Button color='primary' to='/join' component={Link}>
                             Join a Room
                         </Button>
+                        <Button variant='outlined' to='/info' component={Link}>
+                            Info
+                        </Button>
                         <Button color='secondary' to='/create' component={Link}>
                             Create a Room
                         </Button>
@@ -64,6 +68,7 @@ export default function HomePage() {
                     <Route index element={renderHomePage()} />
                 )}
                 <Route path="join" element={<RoomJoinPage />} />
+                <Route path='info' element={<Info />} />
                 <Route path="create" element={<CreateRoomPage />} />
                 <Route path="room/:roomCode" element={<Room />} />
             </Routes>
