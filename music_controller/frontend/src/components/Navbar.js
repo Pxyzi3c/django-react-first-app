@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import { Fragment } from 'react'
 import {
     Disclosure,
@@ -13,10 +13,10 @@ import {
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const navigation = [
-    { name: 'Home', href: '#', current: true },
-    { name: 'Rooms', href: '#', current: false },
-    { name: 'Join Room', href: '#', current: false },
-    { name: 'Create Room', href: '#', current: false },
+    { name: 'Home', href: '/', current: false },
+    // { name: 'Rooms', href: '', current: false },
+    { name: 'Join Room', href: '/join', current: false },
+    { name: 'Create Room', href: '/create', current: false },
 ]
 
 function classNames(...classes) {
@@ -24,6 +24,13 @@ function classNames(...classes) {
 }
 
 export default function Navbar() {
+    const [activePage, setActivePage] = useState(window.location.pathname)
+
+    navigation.map((page) => {
+        if (activePage == page.href) {
+            return page.current = true
+        }
+    })
     return (
         <Disclosure as="nav" className="bg-gray-800 absolute w-100 top-0">
             {({ open }) => (
