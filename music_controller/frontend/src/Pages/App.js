@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "react-dom";
 import Homepage from "./HomePage";
-import Navbar from "./Navbar";
+import Navbar from "../components/Navbar";
 
 export default function App({ name }) {
     return (

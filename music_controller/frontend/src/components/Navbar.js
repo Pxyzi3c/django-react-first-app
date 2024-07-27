@@ -26,11 +26,17 @@ function classNames(...classes) {
 export default function Navbar() {
     const [activePage, setActivePage] = useState(window.location.pathname)
 
-    navigation.map((page) => {
-        if (activePage == page.href) {
-            return page.current = true
-        }
-    })
+    const getActivePage = () => {
+        navigation.map((page) => {
+            if (activePage == page.href) {
+                return page.current = true
+            }
+        })
+    }
+
+    useEffect(() => {
+        getActivePage()
+    }, [])
     return (
         <Disclosure as="nav" className="bg-gray-800 absolute w-100 top-0">
             {({ open }) => (

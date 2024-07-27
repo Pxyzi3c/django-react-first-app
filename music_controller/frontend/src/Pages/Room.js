@@ -18,7 +18,7 @@ import {
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CreateRoomPage from "./CreateRoomPage";
-import MusicPlayer from './MusicPlayer';
+import MusicPlayer from '../components/MusicPlayer';
 
 export default function Room() {
     const navigate = useNavigate();
