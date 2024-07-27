@@ -6,13 +6,8 @@ import {
     Typography,
     Card,
     CardContent,
-    CardHeader,
     CardMedia,
     Box,
-    Divider,
-    Chip, 
-    Button,
-    Grid,
     IconButton,
     LinearProgress,
 } from '@mui/material';
